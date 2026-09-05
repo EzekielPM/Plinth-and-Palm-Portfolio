@@ -308,3 +308,32 @@ html[data-theme="dark"] .contact-floater-toggle {
     height: 27px;
   }
 }
+
+/* Header breakpoint refinement: full shortcuts on tablet/desktop, compact menu on mobile only */
+@media (min-width: 761px) and (max-width: 1060px) {
+  .site-header {
+    grid-template-columns: minmax(180px, 1fr) auto minmax(44px, 1fr);
+  }
+
+  .desktop-nav {
+    display: flex;
+    gap: clamp(16px, 2vw, 28px);
+  }
+
+  .desktop-nav a {
+    font-size: 10px;
+    letter-spacing: .10em;
+  }
+
+  .menu-toggle {
+    display: none;
+  }
+
+  .mobile-nav {
+    display: none;
+  }
+
+  .header-actions {
+    gap: 10px;
+  }
+}
