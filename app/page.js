@@ -1,9 +1,37 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./plinth-update.css";
 
+
+
+function ContactIcon({ type }) {
+  if (type === "whatsapp") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M20 11.5a8 8 0 0 1-11.7 7.1L4 20l1.4-4.1A8 8 0 1 1 20 11.5Z" />
+        <path d="M9 8.6c.4 2.7 2.4 4.7 5.1 5.1" />
+        <path d="M9.1 8.5 8 9.6m6.2 4.2-1.1 1.1" />
+      </svg>
+    );
+  }
+
+  if (type === "phone") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7.2 3.8 10 7.5 8.3 9.2c1.2 2.6 3.3 4.7 5.9 5.9l1.7-1.7 3.7 2.8c.5.4.6 1 .3 1.6l-.8 1.5c-.3.5-.8.8-1.4.7C10.6 19.1 4.9 13.4 4 6.3c-.1-.6.2-1.1.7-1.4l1.5-.8c.4-.3.7-.2 1 .1Z" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="3.5" y="5.5" width="17" height="13" rx="2" />
+      <path d="m5 7 7 5.5L19 7" />
+    </svg>
+  );
+}
 
 const gallery = [
   ["/assets/staircase-feature.png", "Feature wall", "Angle 01"],
@@ -62,6 +90,8 @@ export default function Home() {
   const [lightbox, setLightbox] = useState(null);
   const [formResponse, setFormResponse] = useState("");
   const [contactOpen, setContactOpen] = useState(false);
+  const [contactPosition, setContactPosition] = useState(null);
+  const contactDrag = useRef(null);
 
   useEffect(() => {
     const stored = window.localStorage.getItem("plinth-palm-theme");
@@ -94,6 +124,44 @@ export default function Home() {
 
   const closeMenu = () => setMenuOpen(false);
 
+  const beginContactDrag = (event) => {
+    const box = event.currentTarget.closest(".contact-floater");
+    if (!box) return;
+
+    const rect = box.getBoundingClientRect();
+    contactDrag.current = {
+      startX: event.clientX,
+      startY: event.clientY,
+      left: rect.left,
+      top: rect.top,
+    };
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+  };
+
+  const moveContactDrag = (event) => {
+    if (!contactDrag.current) return;
+    const box = event.currentTarget.closest(".contact-floater");
+    if (!box) return;
+
+    const { startX, startY, left, top } = contactDrag.current;
+    const gap = 8;
+    const nextLeft = Math.min(
+      Math.max(gap, left + event.clientX - startX),
+      Math.max(gap, window.innerWidth - box.offsetWidth - gap)
+    );
+    const nextTop = Math.min(
+      Math.max(gap, top + event.clientY - startY),
+      Math.max(gap, window.innerHeight - box.offsetHeight - gap)
+    );
+
+    setContactPosition({ left: nextLeft, top: nextTop });
+  };
+
+  const endContactDrag = (event) => {
+    contactDrag.current = null;
+    event.currentTarget.releasePointerCapture?.(event.pointerId);
+  };
+
   const handleEnquiry = (event) => {
     event.preventDefault();
     setFormResponse(
@@ -121,6 +189,7 @@ export default function Home() {
           <a href="#home">Home</a>
           <a href="#project">Project</a>
           <a href="#studio">Studio</a>
+          <a href="#founder">About</a>
           <a href="#contact">Contact</a>
         </nav>
 
@@ -144,6 +213,7 @@ export default function Home() {
           <a href="#home" onClick={closeMenu}>Home</a>
           <a href="#project" onClick={closeMenu}>Project</a>
           <a href="#studio" onClick={closeMenu}>Studio</a>
+          <a href="#founder" onClick={closeMenu}>About</a>
           <a href="#contact" onClick={closeMenu}>Contact</a>
         </nav>
       </header>
@@ -409,6 +479,12 @@ export default function Home() {
             <h1>Let’s create a space<br /><em>that feels like home.</em></h1>
             <p>Tell us about your property, Airbnb, interior idea or artisan requirement. We will use the information to understand the scope and prepare the right next conversation.</p>
 
+            <div className="availability-message">
+              <span>Open for new projects</span>
+              <strong>Have a space with potential? Let’s make people remember how it felt.</strong>
+              <p>PLINTH &amp; PALM is open to interior, shortlet and property styling projects, creative commissions and collaborations in Lagos and beyond.</p>
+            </div>
+
             <div className="contact-note">
               <span>Based in</span>
               <strong>Lagos, Nigeria</strong>
@@ -476,17 +552,42 @@ export default function Home() {
           <span>© {new Date().getFullYear()} PLINTH &amp; PALM</span>
         </div>
         <div className="footer-contact-links" aria-label="Footer contact links">
-          <a href="https://wa.me/2347081340236" target="_blank" rel="noreferrer">WhatsApp</a>
-          <a href="tel:+2349065914788">Call</a>
-          <a href="mailto:Plinthandpalm@gmail.com">Email</a>
+          <a className="footer-social-icon" href="https://wa.me/2347081340236" target="_blank" rel="noreferrer" aria-label="WhatsApp PLINTH & PALM" title="WhatsApp">
+            <ContactIcon type="whatsapp" />
+          </a>
+          <a className="footer-social-icon" href="tel:+2349065914788" aria-label="Call PLINTH & PALM" title="Call">
+            <ContactIcon type="phone" />
+          </a>
+          <a className="footer-social-icon" href="mailto:Plinthandpalm@gmail.com" aria-label="Email PLINTH & PALM" title="Email">
+            <ContactIcon type="email" />
+          </a>
+          <a className="back-to-top" href="#home" aria-label="Back to top">
+            <span>Back to top</span><b aria-hidden="true">↑</b>
+          </a>
         </div>
       </footer>
 
-      <aside className={`contact-floater ${contactOpen ? "is-open" : ""}`} aria-label="Quick contact">
+      <aside
+        className={`contact-floater ${contactOpen ? "is-open" : ""}`}
+        aria-label="Quick contact"
+        style={contactPosition ? { left: contactPosition.left, top: contactPosition.top, right: "auto", bottom: "auto" } : undefined}
+      >
+        <button
+          className="contact-floater-drag"
+          type="button"
+          aria-label="Drag quick contact"
+          title="Drag contact box"
+          onPointerDown={beginContactDrag}
+          onPointerMove={moveContactDrag}
+          onPointerUp={endContactDrag}
+          onPointerCancel={endContactDrag}
+        >
+          ⠿
+        </button>
         <div className="contact-floater-links" aria-hidden={!contactOpen}>
-          <a href="https://wa.me/2347081340236" target="_blank" rel="noreferrer" aria-label="WhatsApp PLINTH & PALM">WA</a>
-          <a href="tel:+2349065914788" aria-label="Call PLINTH & PALM">☎</a>
-          <a href="mailto:Plinthandpalm@gmail.com" aria-label="Email PLINTH & PALM">@</a>
+          <a href="https://wa.me/2347081340236" target="_blank" rel="noreferrer" aria-label="WhatsApp PLINTH & PALM"><ContactIcon type="whatsapp" /></a>
+          <a href="tel:+2349065914788" aria-label="Call PLINTH & PALM"><ContactIcon type="phone" /></a>
+          <a href="mailto:Plinthandpalm@gmail.com" aria-label="Email PLINTH & PALM"><ContactIcon type="email" /></a>
         </div>
         <button
           className="contact-floater-toggle"

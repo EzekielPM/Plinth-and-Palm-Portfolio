@@ -169,3 +169,142 @@ html[data-theme="dark"] .contact-floater-toggle {
     height: 27px;
   }
 }
+
+
+/* Targeted refinement: header About link, draggable quick contact, footer icons + availability CTA */
+.availability-message {
+  margin-top: 24px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-left: 3px solid currentColor;
+  border-radius: 14px;
+  background: var(--surface);
+}
+
+.availability-message > span {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.availability-message strong {
+  display: block;
+  max-width: 520px;
+  font-size: clamp(1.05rem, 1.7vw, 1.35rem);
+  line-height: 1.25;
+}
+
+.availability-message p {
+  margin: 9px 0 0;
+  max-width: 560px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.footer-contact-links {
+  align-items: center !important;
+}
+
+.footer-social-icon {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--surface);
+  transition: transform .18s ease, border-color .18s ease;
+}
+
+.footer-social-icon:hover {
+  transform: translateY(-2px);
+  border-color: currentColor;
+}
+
+.footer-social-icon svg,
+.contact-floater-links svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.back-to-top {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.back-to-top b {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.contact-floater {
+  user-select: none;
+}
+
+.contact-floater-drag {
+  width: 22px;
+  height: 29px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: grab;
+  touch-action: none;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.contact-floater-drag:active {
+  cursor: grabbing;
+}
+
+.contact-floater-links a {
+  font-size: 0;
+}
+
+@media (max-width: 760px) {
+  .availability-message {
+    padding: 16px;
+  }
+
+  .footer-contact-links {
+    align-items: center !important;
+  }
+
+  .footer-social-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .back-to-top {
+    min-height: 32px;
+    padding-inline: 10px;
+  }
+
+  .contact-floater-drag {
+    width: 21px;
+    height: 27px;
+  }
+}
