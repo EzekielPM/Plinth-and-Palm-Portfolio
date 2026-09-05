@@ -89,6 +89,7 @@ export default function Home() {
   const [comparePosition, setComparePosition] = useState(50);
   const [lightbox, setLightbox] = useState(null);
   const [formResponse, setFormResponse] = useState("");
+  const [formSending, setFormSending] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
   const [contactPosition, setContactPosition] = useState(null);
   const contactDrag = useRef(null);
@@ -162,11 +163,58 @@ export default function Home() {
     event.currentTarget.releasePointerCapture?.(event.pointerId);
   };
 
-  const handleEnquiry = (event) => {
+  const handleEnquiry = async (event) => {
     event.preventDefault();
-    setFormResponse(
-      "Thank you. Your enquiry has been noted. You can also reach PLINTH & PALM directly by WhatsApp, call or email."
-    );
+    if (formSending) return;
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const email = String(formData.get("email") || "").trim();
+
+    const payload = {
+      name: String(formData.get("name") || "").trim(),
+      email,
+      phone: String(formData.get("phone") || "").trim(),
+      project: String(formData.get("project") || "").trim(),
+      message: String(formData.get("message") || "").trim(),
+      _subject: "New PLINTH & PALM project enquiry",
+      _template: "table",
+      _replyto: email,
+      _honey: String(formData.get("website") || ""),
+    };
+
+    setFormSending(true);
+    setFormResponse("Sending your enquiry...");
+
+    try {
+      const response = await fetch(
+        "https://formsubmit.co/ajax/Plinthandpalm@gmail.com",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || result.success === false) {
+        throw new Error("Unable to send enquiry");
+      }
+
+      form.reset();
+      setFormResponse(
+        "Thank you. Your project enquiry has been sent to PLINTH & PALM. We will get back to you as soon as possible."
+      );
+    } catch (error) {
+      setFormResponse(
+        "We could not send your enquiry right now. Please try again, or contact us directly by WhatsApp, call or email."
+      );
+    } finally {
+      setFormSending(false);
+    }
   };
 
   return (
@@ -506,6 +554,14 @@ export default function Home() {
 
           <form className="contact-form" onSubmit={handleEnquiry}>
             <p className="form-notice">Project enquiry</p>
+            <input
+              type="text"
+              name="website"
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              style={{ position: "absolute", left: "-9999px", opacity: 0, pointerEvents: "none" }}
+            />
             <label>
               <span>Your name</span>
               <input type="text" name="name" autoComplete="name" required />
@@ -535,7 +591,9 @@ export default function Home() {
               <span>Tell us about the space</span>
               <textarea name="message" rows={6} required />
             </label>
-            <button className="button button-solid" type="submit">Send project enquiry</button>
+            <button className="button button-solid" type="submit" disabled={formSending}>
+              {formSending ? "Sending enquiry..." : "Send project enquiry"}
+            </button>
             <p className="form-response" role="status">{formResponse}</p>
           </form>
         </section>
